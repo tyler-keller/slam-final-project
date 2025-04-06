@@ -1,4 +1,4 @@
-### Github Repo: https://github.com/tyler-keller/slam-final-project
+### Slam Final Project
 
 Mono SLAM: 
 - ORB3: https://github.com/UZ-SLAMLab/ORB_SLAM3/tree/master 
