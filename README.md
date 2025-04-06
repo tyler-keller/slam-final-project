@@ -10,7 +10,7 @@ Results
 EVO Report: https://github.com/MichaelGrupp/evo 
 
 LIDAR SLAM:
-- KISS-ICP: https://github.com/PRBonn/kiss-icp 
+- A-LOAM: https://github.com/HKUST-Aerial-Robotics/A-LOAM
 - Screen Capture
 - How it works?
 
