@@ -1,77 +1,77 @@
-FROM ros:noetic
+# following prereqs listed:
+# 1. Prerequisites
+# 1.1 Ubuntu and ROS
+# Ubuntu 64-bit 16.04 or 18.04. ROS Kinetic or Melodic. ROS Installation
+# 1.2. Ceres Solver
+# 1.3. PCL
+FROM ros:melodic
 
-ENV CATKIN_WS=/root/catkin_ws
+RUN echo "new run"
+
+# mac moment...
+# RUN echo 'Acquire::http::Pipeline-Depth 0;\nAcquire::http::No-Cache true;\nAcquire::BrokenProxy true;\n' > /etc/apt/apt.conf.d/99fixbadproxy
+
+SHELL ["/bin/bash", "-c"]
+RUN bash -c "source ~/.bashrc"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-    # setup processors number used to compile library
-RUN if [ "x$(nproc)" = "x1" ] ; then export USE_PROC=1 ; else export USE_PROC=$(($(nproc)/2)) ; fi && \
-    # Install dependencies
-      apt-get update && apt-get install -y \
-      git \
-      cmake \
-      libatlas-base-dev \
-      libeigen3-dev \
-      libgoogle-glog-dev \
-      libsuitesparse-dev \
-      libceres-dev \
-      libpcl-dev \
-      ros-${ROS_DISTRO}-cv-bridge \
-      ros-${ROS_DISTRO}-image-transport \
-      ros-${ROS_DISTRO}-message-filters \
-      ros-${ROS_DISTRO}-tf && \
-    rm -rf /var/lib/apt/lists/*
-    # rm -rf /var/lib/apt/lists/* && \
-    # Build and install Ceres
-    # git clone https://ceres-solver.googlesource.com/ceres-solver && \
-    # cd ceres-solver && \
-    # git checkout tags/${CERES_VERSION} && \
-    # mkdir build && cd build && \
-    # cmake .. && \
-    # make -j${USE_PROC} install && \
-    # cd ../.. && \
-    # rm -rf ./ceres-solver && \
-    # # Build and install pcl
-    # git clone https://github.com/PointCloudLibrary/pcl.git && \
-    # cd pcl && \
-    # git checkout tags/pcl-${PCL_VERSION} && \
-    # mkdir build && cd build && \
-    # cmake .. && \
-    # make -j${USE_PROC} install && \
-    # cd ../.. && \
-    # rm -rf ./pcl && \
-    # # Setup catkin workspace
-    # mkdir -p $CATKIN_WS/src/A-LOAM/
+RUN sudo apt-get update
+RUN sudo apt-get -y install build-essential
+RUN sudo apt-get -y install curl
+RUN sudo apt-get -y install git
 
+# ceres and pcl libraries
+# CMake
+RUN sudo apt-get -y install cmake
+# google-glog + gflags
+RUN sudo apt-get -y install libgoogle-glog-dev libgflags-dev
+# Use ATLAS for BLAS & LAPACK
+RUN sudo apt-get -y install libatlas-base-dev
+# Eigen3
+RUN sudo apt-get -y install libeigen3-dev
+# SuiteSparse (optional)
+RUN sudo apt-get -y install libsuitesparse-dev
+RUN sudo apt-get -y install libceres-dev
+# RUN sudo rm -rf /var/lib/apt/lists/*
+# RUN sudo apt-get update
+# RUN sudo rm -rf /var/lib/apt/lists/partial
+# RUN sudo apt-get update -o Acquire::CompressionTypes::Order::=gz
+# RUN sudo sed -i -re 's/\w+\.archive\.ubuntu\.com/archive.ubuntu.com/g' /etc/apt/sources.list
+RUN sudo apt-get -y install libpcl-dev
 
-RUN apt-get update && \
-  apt-get install -y software-properties-common && \
-  add-apt-repository universe 
+# RUN sudo apt-get -y install libpcl-dev
+# RUN git clone https://github.com/PointCloudLibrary/pcl.git && \
+#   cd pcl && \
+#   git checkout tags/pcl-1.8.0 && \
+#   mkdir build && cd build && \
+#   cmake .. && \
+#   make -j install && \
+#   cd ../.. && \
+#   rm -rf ./pcl 
 
-RUN apt-get install -y ros-${ROS_DISTRO}-perception
+# ros dependencies
+RUN sudo apt-get -y install python-catkin-tools
+RUN sudo apt-get -y install ros-${ROS_DISTRO}-catkin
+RUN sudo apt-get -y install ros-${ROS_DISTRO}-image-transport
+RUN sudo apt-get -y install ros-${ROS_DISTRO}-cv-bridge
+RUN sudo apt-get -y install ros-${ROS_DISTRO}-message-filters
+RUN sudo apt-get -y install ros-${ROS_DISTRO}-tf
+RUN sudo apt-get -y install ros-${ROS_DISTRO}-pcl-conversions
+RUN sudo apt-get -y install ros-${ROS_DISTRO}-rviz
+RUN sudo apt-get -y install ros-${ROS_DISTRO}-perception
+RUN sudo apt-get -y install ros-${ROS_DISTRO}-rqt-graph
 
-RUN ln -s /usr/include/opencv4/opencv2 /usr/include/opencv
-    
-WORKDIR $CATKIN_WS/src
+# evo and python
+RUN apt-get update && apt-get install -y software-properties-common
+RUN add-apt-repository ppa:deadsnakes/ppa -y && apt-get update
+RUN apt-get install -y python3.7 python3-pip
+RUN python3.7 -m pip install --upgrade pip
+RUN python3.7 -m pip install evo
 
-# Copy A-LOAM
-# COPY ./ $CATKIN_WS/src/A-LOAM/
-# use the following line if you only have this dockerfile
+WORKDIR "/root/catkin_ws/src"
 RUN git clone https://github.com/HKUST-Aerial-Robotics/A-LOAM.git
-
-
-
-# Build A-LOAM
-ENV CXXFLAGS="-std=c++14"
-
-WORKDIR $CATKIN_WS
-ENV TERM xterm
-ENV PYTHONIOENCODING UTF-8
-RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && cd /root/catkin_ws && catkin_make"
-# RUN catkin config \
-#       --extend /opt/ros/$ROS_DISTRO \
-#       --cmake-args \
-#         -DCMAKE_BUILD_TYPE=Release && \
-#     catkin build && \
-#     sed -i '/exec "$@"/i \
-#             source "/root/catkin_ws/devel/setup.bash"' /ros_entrypoint.sh
+WORKDIR "/root/catkin_ws"
+RUN source /opt/ros/$ROS_DISTRO/setup.bash && catkin_make -j1
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc 
+RUN echo "source /root/catkin_ws/devel/setup.bash" >> ~/.bashrc
