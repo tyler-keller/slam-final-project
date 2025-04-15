@@ -33,22 +33,7 @@ RUN sudo apt-get -y install libeigen3-dev
 # SuiteSparse (optional)
 RUN sudo apt-get -y install libsuitesparse-dev
 RUN sudo apt-get -y install libceres-dev
-# RUN sudo rm -rf /var/lib/apt/lists/*
-# RUN sudo apt-get update
-# RUN sudo rm -rf /var/lib/apt/lists/partial
-# RUN sudo apt-get update -o Acquire::CompressionTypes::Order::=gz
-# RUN sudo sed -i -re 's/\w+\.archive\.ubuntu\.com/archive.ubuntu.com/g' /etc/apt/sources.list
 RUN sudo apt-get -y install libpcl-dev
-
-# RUN sudo apt-get -y install libpcl-dev
-# RUN git clone https://github.com/PointCloudLibrary/pcl.git && \
-#   cd pcl && \
-#   git checkout tags/pcl-1.8.0 && \
-#   mkdir build && cd build && \
-#   cmake .. && \
-#   make -j install && \
-#   cd ../.. && \
-#   rm -rf ./pcl 
 
 # ros dependencies
 RUN sudo apt-get -y install python-catkin-tools
