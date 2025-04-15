@@ -8,9 +8,6 @@ FROM ros:melodic
 
 RUN echo "new run"
 
-# mac moment...
-# RUN echo 'Acquire::http::Pipeline-Depth 0;\nAcquire::http::No-Cache true;\nAcquire::BrokenProxy true;\n' > /etc/apt/apt.conf.d/99fixbadproxy
-
 SHELL ["/bin/bash", "-c"]
 RUN bash -c "source ~/.bashrc"
 
@@ -47,12 +44,18 @@ RUN sudo apt-get -y install ros-${ROS_DISTRO}-rviz
 RUN sudo apt-get -y install ros-${ROS_DISTRO}-perception
 RUN sudo apt-get -y install ros-${ROS_DISTRO}-rqt-graph
 
+# mesa for x11 stuff
+RUN sudo apt-get -y install mesa-utils libgl1-mesa-glx libgl1-mesa-dri
+
 # evo and python
 RUN apt-get update && apt-get install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa -y && apt-get update
 RUN apt-get install -y python3.7 python3-pip
 RUN python3.7 -m pip install --upgrade pip
 RUN python3.7 -m pip install evo
+
+# tmux for better terminal windows
+RUN apt-get install tmux -y
 
 WORKDIR "/root/catkin_ws/src"
 RUN git clone https://github.com/HKUST-Aerial-Robotics/A-LOAM.git
