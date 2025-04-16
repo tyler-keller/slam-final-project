@@ -6,8 +6,6 @@
 # 1.3. PCL
 FROM ros:melodic
 
-RUN echo "new run"
-
 SHELL ["/bin/bash", "-c"]
 RUN bash -c "source ~/.bashrc"
 
@@ -56,6 +54,7 @@ RUN python3.7 -m pip install evo
 
 # tmux for better terminal windows
 RUN apt-get install tmux -y
+RUN apt-get install vim -y
 
 WORKDIR "/root/catkin_ws/src"
 RUN git clone https://github.com/HKUST-Aerial-Robotics/A-LOAM.git

@@ -29,8 +29,9 @@ used deadsnakes apt repository to install specific python version.
 
 dockerfile is finally building.
 
-# todo
+able to run dockerfile w/ rviz after some brutal debugging.
 
-- run on .bag
+originally attempted to run w/ mesa drivers and software only rendering. failed getting this to work w/ rviz.
 
-- use evo to compute metrics against GT
+pivoted to using NVIDIA GPU. updated docker run command and was able to get everything working.
+
