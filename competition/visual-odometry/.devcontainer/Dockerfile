@@ -116,9 +116,29 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 #     autoconf \ 
 #     libtool 
 
+# Download Require libraries g2o
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends --fix-missing \
+        libspdlog-dev\
+        libsuitesparse-dev\
+        qtdeclarative5-dev \
+        qt5-qmake\
+        libqglviewer-dev-qt5
+
+# Clone the g2o repository
+RUN git clone https://github.com/RainerKuemmerle/g2o.git /root/g2o
+
+# Build g2o
+WORKDIR /root/g2o
+RUN mkdir build && cd build && \
+    cmake .. && \
+    make -j$(nproc) && \
+    make install
+
+# Clean up to reduce image size
+RUN rm -rf /root/g2o
 
 # Set display environment variable to display GUIs in Windows
 ENV DISPLAY=host.docker.internal:0
-
-
 
