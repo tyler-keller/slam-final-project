@@ -129,5 +129,26 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 # Install EVO trajectory evaluation library using pip
 RUN pip3 install --no-cache-dir evo --upgrade
 
+
+# Download Require libraries g2o
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends --fix-missing \
+        libspdlog-dev\
+        libsuitesparse-dev\
+        qtdeclarative5-dev \
+        qt5-qmake\
+        libqglviewer-dev-qt5
+
+# Clone the g2o repository
+RUN git clone https://github.com/RainerKuemmerle/g2o.git /root/g2o
+
+# Build g2o
+WORKDIR /root/g2o
+RUN mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
+    make -j$(nproc) && \
+    make install
+
 # Set display environment variable for GUI forwarding (adjust if needed)
 ENV DISPLAY=host.docker.internal:0
